@@ -24,7 +24,28 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        try {
+            $event = Event::create([
+                ...$request->validate([
+                    'name' => 'required|string|max:255',
+                    'description' => 'nullable|string',
+                    'start_time' => 'required|date',
+                    'end_time' => 'required|date|after:start_time',
+                ]),
+                'user_id' => 1, // TODO: change to the correct user
+            ]);
+
+            return response()->json([
+                'message' => 'Event created!',
+                'data' => $event
+            ], 201);    
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred!',
+                'error' => $e->getMessage(),
+            ], 422);
+        }      
     }
 
     /**
