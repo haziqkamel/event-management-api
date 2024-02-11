@@ -24,7 +24,6 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-
         try {
             $event = Event::create([
                 ...$request->validate([
@@ -56,22 +55,40 @@ class EventController extends Controller
         return response()->json([
             'message' => 'An event was found!',
             'data' => $event
-        ]);
+        ], 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
+    public function update(Request $request, Event $event)
+    {  
+        try {
+            $event->update($request->validate([
+                'name'=> 'sometimes|string|max:255',
+                'description' => 'nullable|string',
+                'start_time' => 'sometimes|date',
+                'end_time' => 'sometimes|date|after:start_time',
+            ]));
+
+            return response()->json([
+                'message' => 'Event updated!',
+                'data' => $event
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred!',
+                'error' => $e->getMessage(),
+            ], 422);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Event $event)
     {
-        //
+        $event->delete();
+        return response(status: 204);
     }
 }
