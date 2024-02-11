@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\EventResource;
 use App\Models\Event;
 use Illuminate\Http\Request;
 
@@ -14,8 +15,8 @@ class EventController extends Controller
     public function index()
     {
         return response()->json([
-            'message' => 'This is the index of events',
-            'data' => Event::all()
+            'message' => 'Successfully retrieved events!',
+            'data' => EventResource::collection(Event::with('user')->get())
         ]);
     }
 
@@ -37,7 +38,7 @@ class EventController extends Controller
 
             return response()->json([
                 'message' => 'Event created!',
-                'data' => $event
+                'data' => new EventResource($event)
             ], 201);    
         } catch (\Exception $e) {
             return response()->json([
@@ -52,9 +53,10 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
+        $event->load('user', 'attendees');
         return response()->json([
             'message' => 'An event was found!',
-            'data' => $event
+            'data' => new EventResource($event)
         ], 200);
     }
 
@@ -73,7 +75,7 @@ class EventController extends Controller
 
             return response()->json([
                 'message' => 'Event updated!',
-                'data' => $event
+                'data' => new EventResource($event)
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
