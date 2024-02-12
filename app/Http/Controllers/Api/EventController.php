@@ -12,11 +12,26 @@ class EventController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $perPage = $request->query("per_page");
+        $events = Event::with('user')->paginate($perPage ?? 10);
+
         return response()->json([
             'message' => 'Successfully retrieved events!',
-            'data' => EventResource::collection(Event::with('user')->get())
+            'data' => EventResource::collection($events),
+                'meta' => [
+                    'total' => $events->total(),
+                    'per_page' => $events->perPage(),
+                    'current_page' => $events->currentPage(),
+                    'last_page' => $events->lastPage(),
+                    'from' => $events->firstItem(),
+                    'to' => $events->lastItem(),
+                    "prev_page_url" => $events->previousPageUrl(),
+                    "next_page_url" => $events->nextPageUrl(),
+                    "first_page_url" => $events->url(1),
+                    "last_page_url" => $events->url($events->lastPage()),
+                ],
         ]);
     }
 
