@@ -17,6 +17,7 @@ class EventController extends Controller
 
     public function __construct()
     {
+        $this->middleware('auth:sanctum')->except(['index', 'show']);
         $this->relations = ['user', 'attendees', 'attendees.user'];
     }
 
@@ -73,7 +74,7 @@ class EventController extends Controller
                     'start_time' => 'required|date',
                     'end_time' => 'required|date|after:start_time',
                 ]),
-                'user_id' => 1, // TODO: change to the correct user
+                'user_id' => $request->user()->id,
             ]);
 
             return response()->json([
