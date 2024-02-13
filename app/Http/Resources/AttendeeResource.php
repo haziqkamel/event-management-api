@@ -17,8 +17,8 @@ class AttendeeResource extends JsonResource
         return [
             "id"=> $this->id,
             "event_id"=> $this->event_id,
-            // Load user of the attendee
-            "user" => new UserResource($this->user),
+            // // Load user of the attendee
+            "user" => new UserResource($this->whenLoaded("user")),
             "created_at" => $this->created_at,
         ];
     }
