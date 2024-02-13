@@ -68,7 +68,6 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 # Notes
 ## Route Caching
-
 [https://laravel.com/docs/10.x/routing#route-caching](https://laravel.com/docs/10.x/routing#route-caching)
 
 - Cache Route
@@ -80,3 +79,6 @@ php artisan route:cache
 ```
 php artisan route:clear
 ```
+
+## Token Expiration
+[https://laravel.com/docs/10.x/sanctum#token-expiration](https://laravel.com/docs/10.x/sanctum#token-expiration)
