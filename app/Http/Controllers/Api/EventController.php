@@ -14,8 +14,19 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
+
+        $query = Event::query();
+        $relations = ['user', 'attendees', 'attendees.user'];
         $perPage = $request->query("per_page");
-        $events = Event::with('user')->paginate($perPage ?? 10);
+
+        foreach ($relations as $relation) {
+            $query->when(
+                $this->shouldIncludeRelation($relation), 
+                fn($q) => $q->with($relation)
+            );
+        }
+
+        $events = $query->latest()->paginate($perPage ?? 10);
 
         return response()->json([
             'message' => 'Successfully retrieved events!',
@@ -33,6 +44,18 @@ class EventController extends Controller
                     "last_page_url" => $events->url($events->lastPage()),
                 ],
         ]);
+    }
+
+    protected function shouldIncludeRelation(string $relation): bool
+    {
+        $include = request()->query('include');
+
+        if (!$include) {
+            return false;
+        }
+
+        $relations = array_map('trim', explode(',', $include));
+        return in_array($relation, $relations);
     }
 
     /**
