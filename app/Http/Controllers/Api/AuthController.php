@@ -26,7 +26,7 @@ class AuthController extends Controller
                 ]);
             }
 
-            $token = $user->createToken($request->email)->plainTextToken;
+            $token = $user->createToken($request->email, ['*'], now()->addDay())->plainTextToken;
             return response()->json(['token' => $token]);
         } catch (ValidationException $e) {
             return response()->json([
