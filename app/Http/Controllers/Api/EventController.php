@@ -4,27 +4,29 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\EventResource;
+use App\Http\Traits\CanLoadRelationships;
 use App\Models\Event;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
+
+    use CanLoadRelationships;
+
+    private array $relations;
+
+    public function __construct()
+    {
+        $this->relations = ['user', 'attendees', 'attendees.user'];
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-
-        $query = Event::query();
-        $relations = ['user', 'attendees', 'attendees.user'];
+        $query = $this->loadRelationships(Event::query());
         $perPage = $request->query("per_page");
-
-        foreach ($relations as $relation) {
-            $query->when(
-                $this->shouldIncludeRelation($relation), 
-                fn($q) => $q->with($relation)
-            );
-        }
 
         $events = $query->latest()->paginate($perPage ?? 10);
 
@@ -76,7 +78,7 @@ class EventController extends Controller
 
             return response()->json([
                 'message' => 'Event created!',
-                'data' => new EventResource($event)
+                'data' => new EventResource($this->loadRelationships($event)),
             ], 201);    
         } catch (\Exception $e) {
             return response()->json([
@@ -91,10 +93,9 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        $event->load('user', 'attendees');
         return response()->json([
             'message' => 'An event was found!',
-            'data' => new EventResource($event)
+            'data' => new EventResource($this->loadRelationships($event)),
         ], 200);
     }
 
@@ -113,7 +114,7 @@ class EventController extends Controller
 
             return response()->json([
                 'message' => 'Event updated!',
-                'data' => new EventResource($event)
+                'data' => new EventResource($this->loadRelationships($event)),
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
