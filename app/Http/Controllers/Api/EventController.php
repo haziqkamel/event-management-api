@@ -34,18 +34,18 @@ class EventController extends Controller
         return response()->json([
             'message' => 'Successfully retrieved events!',
             'data' => EventResource::collection($events),
-                'meta' => [
-                    'total' => $events->total(),
-                    'per_page' => $events->perPage(),
-                    'current_page' => $events->currentPage(),
-                    'last_page' => $events->lastPage(),
-                    'from' => $events->firstItem(),
-                    'to' => $events->lastItem(),
-                    "prev_page_url" => $events->previousPageUrl(),
-                    "next_page_url" => $events->nextPageUrl(),
-                    "first_page_url" => $events->url(1),
-                    "last_page_url" => $events->url($events->lastPage()),
-                ],
+            'meta' => [
+                'total' => $events->total(),
+                'per_page' => $events->perPage(),
+                'current_page' => $events->currentPage(),
+                'last_page' => $events->lastPage(),
+                'from' => $events->firstItem(),
+                'to' => $events->lastItem(),
+                "prev_page_url" => $events->previousPageUrl(),
+                "next_page_url" => $events->nextPageUrl(),
+                "first_page_url" => $events->url(1),
+                "last_page_url" => $events->url($events->lastPage()),
+            ],
         ]);
     }
 
@@ -80,13 +80,13 @@ class EventController extends Controller
             return response()->json([
                 'message' => 'Event created!',
                 'data' => new EventResource($this->loadRelationships($event)),
-            ], 201);    
+            ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'An error occurred!',
                 'error' => $e->getMessage(),
             ], 422);
-        }      
+        }
     }
 
     /**
@@ -104,10 +104,16 @@ class EventController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, Event $event)
-    {  
+    {
+        if ($request->user()->cannot('update-event', $event)) {
+            return response()->json([
+                'message' => 'You are not authorized to update this event!',
+            ], 403);
+        }
+
         try {
             $event->update($request->validate([
-                'name'=> 'sometimes|string|max:255',
+                'name' => 'sometimes|string|max:255',
                 'description' => 'nullable|string',
                 'start_time' => 'sometimes|date',
                 'end_time' => 'sometimes|date|after:start_time',
