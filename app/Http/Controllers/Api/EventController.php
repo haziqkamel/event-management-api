@@ -18,6 +18,7 @@ class EventController extends Controller
     public function __construct()
     {
         $this->middleware('auth:sanctum')->except(['index', 'show']);
+        $this->authorizeResource(Event::class, 'event');
         $this->relations = ['user', 'attendees', 'attendees.user'];
     }
 
@@ -105,12 +106,6 @@ class EventController extends Controller
      */
     public function update(Request $request, Event $event)
     {
-        if ($request->user()->cannot('update-event', $event)) {
-            return response()->json([
-                'message' => 'You are not authorized to update this event!',
-            ], 403);
-        }
-
         try {
             $event->update($request->validate([
                 'name' => 'sometimes|string|max:255',

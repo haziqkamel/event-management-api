@@ -19,6 +19,7 @@ class AttendeeController extends Controller
     public function __construct()
     {
         $this->middleware('auth:sanctum')->except(['index', 'show']);
+        $this->authorizeResource(Attendee::class, 'attendee');
         $this->relations = ['user'];
     }
 
@@ -79,23 +80,15 @@ class AttendeeController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Request $request, Event $event, Attendee $attendee)
     {
-        if ($request->user()->cannot('delete-attendee', [$event, $attendee])) {
-            return response()->json([
-                'message' => 'You are not authorized to delete this attendee!',
-            ], 403);
-        }
+        // if ($request->user()->cannot('delete-attendee', [$event, $attendee])) {
+        //     return response()->json([
+        //         'message' => 'You are not authorized to delete this attendee!',
+        //     ], 403);
+        // }
 
         $attendee->delete();
         return response(status: 204);
