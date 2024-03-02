@@ -82,3 +82,8 @@ php artisan route:clear
 
 ## Token Expiration
 [https://laravel.com/docs/10.x/sanctum#token-expiration](https://laravel.com/docs/10.x/sanctum#token-expiration)
+
+## Scheduling Work
+```
+php artisan schedule:work
+```
