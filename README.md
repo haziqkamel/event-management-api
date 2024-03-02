@@ -67,6 +67,17 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 
 # Notes
+
+## Migrate & Seeding Database
+- Create the Database if haven't
+```
+php artisan migrate
+```
+- Seeding the database with mock data
+```
+php artisan migrate:refresh --seed
+```
+
 ## Route Caching
 [https://laravel.com/docs/10.x/routing#route-caching](https://laravel.com/docs/10.x/routing#route-caching)
 
